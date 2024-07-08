@@ -262,15 +262,22 @@ def read_records(DATA, name):
 
 from constants import PASSWORDS
 
-def authenticate_user(name, password):
+def authenticate_required(func):
     """
-    Authenticate the user based on username and password.
+    Decorator function to authenticate user before accessing functionalities.
     """
-    if name in ALL_USERS and PASSWORDS[name] == password:
-        return True
-    else:
-        return False
+    def wrapper(name):
+        password = input("Enter the password of user: ")
+        if authenticate_user(name, password):
+            return func(name)
+        else:
+            print(f"Unauthorized User={name}, trying to access the application...")
+            send_email(receivers, UNAUTHENTICATED_MESSAGE)
+            log.warning(f"Unauthorized User={name}, trying to access the application...")
+            exit()
+    return wrapper
 
+@authenticate_required
 
 
 def main_program():
